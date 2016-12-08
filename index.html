@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <title>EASYUI ADMIN</title>
+
+    <link rel="stylesheet" type="text/css" href="easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+    <script type="text/javascript" src="easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="easyui/locale/easyui-lang-zh_CN.js"></script>
+
+    <style>
+        .header{
+            background: #2d3e50;
+            color: #fff;
+            direction: ltr;
+        }
+        .header .navbar{
+            margin-bottom: 0;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .header a,.header a:hover{
+            color: #fff;
+            line-height: 50px;
+        }
+        .header .content{
+            padding: 0.5em 4.5%;
+        }
+        .content{
+            padding: 2em;
+            padding-left: 5%;
+            padding-right: 5%;
+            max-width: 1230px;
+            margin: 0 auto;
+        }
+        .hmenu{width:900px;margin:0 auto;font-size:22px;margin-top:20px;}
+        .foot{text-align:center;font-size:12px;height:20px;padding:5px;}
+
+        .left{padding:10px;}
+    </style>
+
+    <script>
+
+$(function(){
+    $('#menu').tree({
+        url: 'tree.json',
+        loadFilter: function(data){
+            if (data.d){
+                return data.d;
+            } else {
+                return data;
+            }
+        },
+        onClick: function(node){
+           // alert(node.url);
+            openTab(node);
+           // alert(node.attributes.url);  // alert node text property when clicked
+        }
+    });
+})
+
+
+function openTab(node){
+    if(node.url==undefined){
+        return;
+    }
+    if($("#tabs").tabs("exists",node.text)){
+        $("#tabs").tabs("select",node.text);
+    }else{
+        var content="<iframe frameborder=0 scrolling='no' style='width:100%;height:100%' src='"+node.url+"'></iframe>"
+        $("#tabs").tabs("add",{
+            title:node.text,
+            iconCls:node.iconCls,
+            closable:true,
+            content:content
+        });
+    }
+}
+
+function collapseAll(){
+    $('#menu').tree('collapseAll');
+}
+function expandAll(){
+    $('#menu').tree('expandAll');
+}
+    </script>
+</head>
+<body class="easyui-layout">
+<div data-options="region:'north',border:false" style="height:100px;" class="header">
+
+    <div  class="hmenu">
+
+        欢迎你,<a href="ss">Admin</a>&nbsp;<a href="ss">退出</a>
+    </div>
+</div>
+<div data-options="region:'south',split:true"  >
+   <div class="foot"> &copy; 2016 All Rights Reserved </div>
+
+</div>
+<div data-options="region:'center'">
+    <div class="easyui-layout" data-options="fit:true">
+        <div data-options="region:'west',collapsed:false" style="width:180px">
+            <div  class="left">
+            <div>
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="collapseAll()" >折叠所有</a>
+
+                <a href="javascript:void(0)" class="easyui-linkbutton"  onclick="expandAll()"  >展开所有</a>
+
+            </div>
+            <div id="menu"></div>
+            </div>
+        </div>
+        <div data-options="region:'center'" >
+
+         <div   id="tabs" class="easyui-tabs" style="width:100%;height:100%">
+
+             <div title="主页" style="padding:10px;"><h3>hello</h3></div>
+         </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+    <script type="text/javascript" src="easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="easyui/locale/easyui-lang-zh_CN.js"></script>
+
+</head>
+<body>
+<table id="dg" title="" class="easyui-datagrid" style="width:100%;height:100%"
+       url="api.json"
+       toolbar="#toolbar" pagination="true"
+       rownumbers="true" fitColumns="true" singleSelect="true">
+    <thead>
+    <tr>
+        <th field="name" width="50">姓名</th>
+        <th field="account" width="50">账号</th>
+        <th field="sex" width="50">性别</th>
+        <th field="tel" width="50">电话</th>
+        <th field="dept" width="50">部门</th>
+        <th field="job" width="50">岗位</th>
+    </tr>
+    </thead>
+</table>
+<div id="toolbar">
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">新建</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">编辑</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">移除</a>
+    <div>
+
+        姓名 <input type="text" name="qname" id="qname"  />
+       性别 <select id="qsex" class="easyui-combobox" name="qsex" style="width:60px;">
+        <option value="">全部</option>
+            <option value="男">男</option>
+            <option value="女">女</option>
+        </select>
+        部门 <input type="text" name="qdept" id="qdept"  />
+        职位 <input type="text" name="qjob" id="qjob"  />
+        <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-search"  onclick="doSearch();">查询</a>
+    </div>
+</div>
+
+<div id="dlg" class="easyui-dialog" style="width:400px;height:380px;padding:10px 20px"
+     closed="true" buttons="#dlg-buttons">
+    <div class="ftitle">用户信息</div>
+    <form id="fm" method="post" novalidate>
+        <div class="fitem">
+            <label>姓名:</label>
+            <input name="name" class="easyui-textbox" required="true">
+        </div>
+        <div class="fitem">
+            <label>账号:</label>
+            <input name="account" class="easyui-textbox" required="true">
+        </div>
+        <div class="fitem">
+            <label>性别:</label>
+            <select id="sex" class="easyui-combobox" name="sex" style="width:60px;"  required="true">
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
+        </div>
+        <div class="fitem">
+            <label>电话:</label>
+            <input name="tel" class="easyui-textbox" validType="phone"  required="true">
+        </div>
+        <div class="fitem">
+            <label>部门:</label>
+            <input name="dept" class="easyui-textbox"   required="true">
+        </div>
+        <div class="fitem">
+            <label>职位:</label>
+            <input name="job" class="easyui-textbox"   required="true">
+        </div>
+    </form>
+</div>
+<div id="dlg-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveUser()" style="width:90px">保存</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">取消</a>
+</div>
+<script type="text/javascript">
+    var url;
+    function newUser(){
+        $('#dlg').dialog('open').dialog('setTitle','新建用户');
+        $('#fm').form('clear');
+        url = 'saveU.json';
+    }
+    function editUser(){
+        var row = $('#dg').datagrid('getSelected');
+        if (row){
+            $('#dlg').dialog('open').dialog('setTitle','编辑用户');
+            $('#fm').form('load',row);
+            url = 'updateU.json?id='+row.id;
+        }
+    }
+    function saveUser(){
+        $('#fm').form('submit',{
+            url: url,
+            onSubmit: function(){
+                return $(this).form('validate');
+            },
+            success: function(result){
+                var result = eval('('+result+')');
+                if (result.errorMsg){
+                    $.messager.show({
+                        title: 'Error',
+                        msg: result.errorMsg
+                    });
+                } else {
+                    $('#dlg').dialog('close');		// close the dialog
+                    $('#dg').datagrid('reload');	// reload the user data
+                }
+            }
+        });
+    }
+    function destroyUser(){
+        var row = $('#dg').datagrid('getSelected');
+        if (row){
+            $.messager.confirm('确认','你确定要删除该用户吗?',function(r){
+                if (r){
+                    $.post('deleteU.json',{id:row.id},function(result){
+                        if (result.success){
+                            $('#dg').datagrid('reload');	// reload the user data
+                        } else {
+                            $.messager.show({	// show error message
+                                title: 'Error',
+                                msg: result.errorMsg
+                            });
+                        }
+                    },'json');
+                }
+            });
+        }
+    }
+
+    function doSearch(){
+        $('#dg').datagrid({url:'api.json?name='+$("#qname").val()});
+    }
+</script>
+<style type="text/css">
+    #fm{
+        margin:0;
+        padding:10px 30px;
+    }
+    .ftitle{
+        font-size:14px;
+        font-weight:bold;
+        padding:5px 0;
+        margin-bottom:10px;
+        border-bottom:1px solid #ccc;
+    }
+    .fitem{
+        margin-bottom:5px;
+    }
+    .fitem label{
+        display:inline-block;
+        width:80px;
+    }
+    .fitem input{
+        width:160px;
+    }
+</style>
+</body>
+</html>

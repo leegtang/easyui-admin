@@ -1,0 +1,22 @@
+[{
+  "id":1,
+  "text":"管理系统",
+  "iconCls":"icon-book",
+  "children":[{
+    "text":"人员管理",
+    "checked":true,
+    "url":"list.html"
+  }]
+},{
+  "text":"其他",
+  "state":"closed",
+  "children":[{
+    "text":"Easyui官网",
+    "url":"http://www.jeasyui.com/"
+  },
+    {
+      "text":"李唐网",
+      "url":"http://www.leegtang.com/"
+    }
+  ]
+}]
